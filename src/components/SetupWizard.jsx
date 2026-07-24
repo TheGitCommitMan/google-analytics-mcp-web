@@ -116,14 +116,27 @@ export default function SetupWizard({ isOpen, onClose }) {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">GCP Project ID</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-medium text-slate-300">GCP Project ID</label>
+                  <a
+                    href="https://console.cloud.google.com/projectselector2/home/dashboard"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-amber-400 hover:underline flex items-center space-x-1"
+                  >
+                    <span>Find Project ID ↗</span>
+                  </a>
+                </div>
                 <input
                   type="text"
                   value={projectId}
                   onChange={(e) => setProjectId(e.target.value)}
                   className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-amber-500"
-                  placeholder="my-gcp-project-id"
+                  placeholder="e.g. my-gcp-project-123456"
                 />
+                <p className="text-[10px] text-slate-400 mt-1">
+                  Or run in terminal: <code className="text-amber-300">gcloud config get-value project</code>
+                </p>
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-300 mb-1">Path to Credentials JSON</label>
@@ -132,8 +145,9 @@ export default function SetupWizard({ isOpen, onClose }) {
                   value={credPath}
                   onChange={(e) => setCredPath(e.target.value)}
                   className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-amber-500"
-                  placeholder="/path/to/credentials.json"
+                  placeholder="/Users/username/.config/gcloud/application_default_credentials.json"
                 />
+                <p className="text-[10px] text-slate-400 mt-1">Default path created by <code className="text-amber-300">gcloud auth application-default login</code></p>
               </div>
             </div>
           </div>
