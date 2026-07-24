@@ -76,14 +76,25 @@ export default function SetupWizard({ isOpen, onClose }) {
         {/* Content Body */}
         <div className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
           
+          {/* Where are the Credentials Banner */}
+          <div className="bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl space-y-2">
+            <div className="flex items-center space-x-2 text-amber-300 font-heading font-bold text-sm">
+              <Key className="w-4 h-4 text-amber-400" />
+              <span>Where do your Google Analytics Credentials come from?</span>
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Google Analytics credentials are <strong>never stored on GitHub or web servers</strong> for security. They live locally on your computer at <code className="text-amber-300 font-mono">~/.config/gcloud/application_default_credentials.json</code> generated via Google Cloud CLI (<code className="text-slate-200 font-mono">gcloud</code>) or an OAuth Desktop Client JSON.
+            </p>
+          </div>
+
           {/* Step 1: GCP Credentials */}
           <div className="space-y-3">
             <div className="flex items-center space-x-2 text-amber-400 font-heading font-semibold text-sm">
               <span className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-xs">1</span>
-              <span>Authenticate Google Cloud Application Default Credentials (ADC)</span>
+              <span>Generate Credentials via Google Cloud CLI (gcloud)</span>
             </div>
             <p className="text-xs text-slate-300">
-              Enable the <strong className="text-slate-100">Google Analytics Admin API</strong> and <strong className="text-slate-100">Google Analytics Data API</strong> in your GCP console, then run:
+              Run this command in your terminal to log in and save credentials with Google Analytics read-only scope:
             </p>
             <div className="relative bg-slate-900 border border-slate-800 rounded-xl p-3.5 font-mono text-xs text-amber-200">
               <pre className="whitespace-pre-wrap">{gcloudCmd}</pre>
