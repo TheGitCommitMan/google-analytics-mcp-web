@@ -137,25 +137,27 @@ export default function PromptAssistant() {
                   <div className="bg-slate-900/90 border border-slate-800/80 p-4 rounded-2xl rounded-tl-none text-slate-200 text-sm space-y-3">
                     <p>{msg.text}</p>
 
-                    {/* Formatted Report Card if available */}
+                    {/* Formatted GA4 Report Table */}
                     {msg.reportData && (
                       <div className="overflow-x-auto border border-slate-800 rounded-xl bg-slate-950 p-2 text-xs">
                         <table className="w-full text-left font-mono">
                           <thead className="border-b border-slate-800 text-slate-400">
                             <tr>
-                              <th className="p-2">Channel</th>
-                              <th className="p-2">Country</th>
-                              <th className="p-2 text-right">Users</th>
-                              <th className="p-2 text-right">Revenue</th>
+                              <th className="p-2">sessionSourceMedium</th>
+                              <th className="p-2">country</th>
+                              <th className="p-2 text-right">activeUsers</th>
+                              <th className="p-2 text-right">purchaseRevenue</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-800/60">
                             {msg.reportData.rows.slice(0, 4).map((r, i) => (
                               <tr key={i}>
-                                <td className="p-2 text-amber-300 font-sans">{r.dimensionValues[0]}</td>
-                                <td className="p-2 text-slate-300">{r.dimensionValues[1]}</td>
-                                <td className="p-2 text-right text-slate-100">{r.metricValues[0]}</td>
-                                <td className="p-2 text-right text-amber-400 font-bold">{r.metricValues[3]}</td>
+                                <td className="p-2 text-amber-300 font-sans">{r.dimensionValues[0]?.value}</td>
+                                <td className="p-2 text-slate-300">{r.dimensionValues[1]?.value}</td>
+                                <td className="p-2 text-right text-slate-100">{parseInt(r.metricValues[0]?.value || 0, 10).toLocaleString()}</td>
+                                <td className="p-2 text-right text-amber-400 font-bold">
+                                  ${parseFloat(r.metricValues[4]?.value || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                </td>
                               </tr>
                             ))}
                           </tbody>

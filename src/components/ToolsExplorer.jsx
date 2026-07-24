@@ -67,26 +67,36 @@ export default function ToolsExplorer() {
         <div>
           <h2 className="font-heading text-2xl font-bold text-white flex items-center space-x-2">
             <LayoutGrid className="w-6 h-6 text-amber-400" />
-            <span>Interactive MCP Tool Playground</span>
+            <span>Interactive GA4 MCP Tool Playground</span>
           </h2>
           <p className="text-sm text-slate-400">
-            Execute tools directly against the Google Analytics Admin & Data APIs specification.
+            Execute tools directly against the official Google Analytics Admin API v1beta & Data API v1beta specification.
           </p>
         </div>
 
-        {/* Global Property Selector */}
-        <div className="flex items-center space-x-3 glass-panel p-2 rounded-xl border border-slate-800">
-          <Filter className="w-4 h-4 text-amber-400 ml-2" />
-          <span className="text-xs text-slate-400 font-medium">Target Property:</span>
+        {/* Global Property Selector & Custom Input */}
+        <div className="flex flex-wrap items-center gap-2 glass-panel p-2 rounded-xl border border-slate-800">
+          <Filter className="w-4 h-4 text-amber-400 ml-1" />
+          <span className="text-xs text-slate-400 font-medium">Target GA4 Property:</span>
           <select
             value={selectedProperty}
             onChange={(e) => setSelectedProperty(e.target.value)}
             className="bg-slate-900 border border-slate-700 text-amber-300 font-mono text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-amber-500"
           >
-            <option value="310492851">properties/310492851 (Acme Web Store)</option>
-            <option value="310492999">properties/310492999 (Acme iOS App)</option>
-            <option value="495810239">properties/495810239 (Cloud Dashboard)</option>
+            <option value="213025502">properties/213025502 (Google Merchandise Store GA4)</option>
+            <option value="213029999">properties/213029999 (Google Store Mobile App)</option>
+            <option value="245810239">properties/245810239 (Flood-it! Gaming Stream)</option>
+            <option value="custom">Custom Property ID...</option>
           </select>
+
+          {selectedProperty === 'custom' && (
+            <input
+              type="text"
+              placeholder="e.g. 310492851"
+              onChange={(e) => setSelectedProperty(e.target.value || '310492851')}
+              className="bg-slate-950 border border-amber-500/50 text-amber-200 font-mono text-xs rounded-lg px-2.5 py-1.5 focus:outline-none w-32"
+            />
+          )}
         </div>
       </div>
 
@@ -369,33 +379,45 @@ function RenderVisualResult({ toolId, data }) {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <div className="text-xs font-mono text-slate-400">Core Report Results (Acquisition & Revenue)</div>
-          <div className="text-xs font-mono text-amber-400">Date Range: Last 30 Days</div>
+          <div className="text-xs font-mono text-slate-400">GA4 Data API v1beta Report (<code className="text-emerald-400">analyticsData#runReport</code>)</div>
+          <div className="text-xs font-mono text-amber-400">Date Range: 30daysAgo - today</div>
         </div>
 
         <div className="overflow-x-auto border border-slate-800 rounded-xl bg-slate-900/60">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-900 border-b border-slate-800 text-slate-400 font-mono">
               <tr>
-                <th className="p-3">Channel Group</th>
-                <th className="p-3">Country</th>
-                <th className="p-3">Device</th>
-                <th className="p-3 text-right">Active Users</th>
-                <th className="p-3 text-right">Sessions</th>
-                <th className="p-3 text-right">Conversions</th>
-                <th className="p-3 text-right">Revenue</th>
+                {data.dimensionHeaders.map((dh, i) => (
+                  <th key={i} className="p-3">{dh.name}</th>
+                ))}
+                {data.metricHeaders.map((mh, i) => (
+                  <th key={i} className="p-3 text-right">{mh.name}</th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 text-slate-200 font-mono">
               {data.rows.map((row, idx) => (
                 <tr key={idx} className="hover:bg-slate-800/40">
-                  <td className="p-3 font-sans font-medium text-amber-300">{row.dimensionValues[0]}</td>
-                  <td className="p-3 font-sans text-slate-300">{row.dimensionValues[1]}</td>
-                  <td className="p-3 text-slate-400">{row.dimensionValues[2]}</td>
-                  <td className="p-3 text-right font-bold text-slate-100">{row.metricValues[0]}</td>
-                  <td className="p-3 text-right text-slate-300">{row.metricValues[1]}</td>
-                  <td className="p-3 text-right text-emerald-400">{row.metricValues[2]}</td>
-                  <td className="p-3 text-right font-bold text-amber-400">{row.metricValues[3]}</td>
+                  {row.dimensionValues.map((dv, i) => (
+                    <td key={i} className={`p-3 ${i === 0 ? 'font-sans font-medium text-amber-300' : 'text-slate-300'}`}>
+                      {dv.value}
+                    </td>
+                  ))}
+                  {row.metricValues.map((mv, i) => {
+                    const isCurrency = data.metricHeaders[i]?.name === 'purchaseRevenue';
+                    const isFloat = data.metricHeaders[i]?.type === 'TYPE_FLOAT';
+                    const numVal = parseFloat(mv.value);
+                    const formatted = isCurrency
+                      ? `$${numVal.toLocaleString('en-US', { minimumFractionDigits: 2 })}`
+                      : isFloat
+                      ? `${(numVal * 100).toFixed(1)}%`
+                      : parseInt(mv.value, 10).toLocaleString();
+                    return (
+                      <td key={i} className={`p-3 text-right ${isCurrency ? 'font-bold text-amber-400' : i === 0 ? 'font-bold text-slate-100' : 'text-slate-300'}`}>
+                        {formatted}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
